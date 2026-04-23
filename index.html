@@ -113,28 +113,44 @@
         </div>
     </div>
 
-    <!-- Amplitude SDK -->
+    <!-- Amplitude SDK - CORRECTED VERSION -->
     <script>
-        (function(e,t){var n=e.amplitude||{_q:[],_iq:{}};var r=t.createElement("script");r.type="text/javascript";
-        r.async=true;r.src="https://cdn.amplitude.com/libs/amplitude-8.21.0-min.gz.js";
-        var i=t.getElementsByTagName("script")[0];i.parentNode.insertBefore(r,i);
-        function s(e,t){e.prototype[t]=function(){this._q.push([t].concat(Array.prototype.slice.call(arguments,0)));return this}}
-        var o=function(){this._q=[];return this};var a=["add","append","clearAll","prepend","set","setOnce","unset"];
-        for(var c=0;c<a.length;c++){s(o,a[c])}n.Identify=o;var u=function(){this._q=[];return this};
-        var l=["setProductId","setQuantity","setPrice","setRevenueType","setEventProperties"];
-        for(var p=0;p<l.length;p++){s(u,l[p])}n.Revenue=u;
-        var d=["init","logEvent","setUserId","setUserProperties","setOptOut","setVersionName","setDomain","setDeviceId","setGlobalUserProperties","identify","clearUserProperties","setGroup","logRevenueV2","regenerateDeviceId","groupIdentify","onInit"];
-        for(var h=0;h<d.length;h++){s(n,d[h])}n.getInstance=function(e){return e===t&&(e="default"),n._iq[e]=n._iq[e]||new o,n._iq[e]};e.amplitude=n;
+        (function(e,t){var r=e.amplitude||{_q:[],_iq:{}};var n=t.createElement("script");n.type="text/javascript";
+        n.async=true;n.src="https://cdn.amplitude.com/libs/amplitude-8.21.0-min.gz.js";
+        n.onload=function(){if(!e.amplitude.runQueuedFunctions){console.log("Amplitude SDK loaded")}};
+        var i=t.getElementsByTagName("script")[0];i.parentNode.insertBefore(n,i);
+        e.amplitude=r;
         })(window,document);
+    </script>
 
-        // ⚠️ REPLACE THIS WITH YOUR FULL API KEY ⚠️
-        amplitude.init("6b3f0e7c68c61c6cc7646ac14e66d503", null, {
-            includeReferrer: true,
-            includeUtm: true
-        });
-        
-        amplitude.setUserId("demo_user_" + Math.random().toString(36).substr(2, 8));
-        console.log("Amplitude initialized");
+    <script>
+        // Wait for Amplitude SDK to load before initializing
+        function initAmplitude() {
+            if (typeof amplitude !== 'undefined' && amplitude.init) {
+                amplitude.init("6b3f0e7c68c61c6cc7646ac14e66d503", null, {
+                    includeReferrer: true,
+                    includeUtm: true
+                });
+                amplitude.setUserId("demo_user_" + Math.random().toString(36).substr(2, 8));
+                console.log("Amplitude initialized successfully");
+                return true;
+            }
+            return false;
+        }
+
+        // Try to initialize immediately, retry if needed
+        if (!initAmplitude()) {
+            var retryCount = 0;
+            var retryInterval = setInterval(function() {
+                retryCount++;
+                if (initAmplitude()) {
+                    clearInterval(retryInterval);
+                } else if (retryCount > 20) {
+                    clearInterval(retryInterval);
+                    console.log("Failed to load Amplitude after 10 seconds");
+                }
+            }, 500);
+        }
     </script>
 
     <script>
@@ -149,32 +165,32 @@
                 }, 2000);
             }
             
-            document.getElementById('signupBtn').onclick = function() {
-                if (typeof amplitude !== 'undefined') {
-                    amplitude.logEvent("Sign Up Clicked", {
-                        button: "signup",
-                        page: window.location.href,
-                        time: new Date().toISOString()
-                    });
-                    showStatus("✅ 'Sign Up Clicked' sent to Amplitude!", false);
-                    console.log("Event: Sign Up Clicked");
+            function logEvent(eventName, properties) {
+                if (typeof amplitude !== 'undefined' && amplitude.logEvent) {
+                    amplitude.logEvent(eventName, properties);
+                    showStatus(`✅ '${eventName}' sent to Amplitude!`, false);
+                    console.log(`Event: ${eventName}`, properties);
+                    return true;
                 } else {
-                    showStatus("⚠️ Amplitude loading...", true);
+                    showStatus(`⚠️ Amplitude not ready yet...`, true);
+                    return false;
                 }
+            }
+            
+            document.getElementById('signupBtn').onclick = function() {
+                logEvent("Sign Up Clicked", {
+                    button: "signup",
+                    page: window.location.href,
+                    time: new Date().toISOString()
+                });
             };
             
             document.getElementById('demoBtn').onclick = function() {
-                if (typeof amplitude !== 'undefined') {
-                    amplitude.logEvent("Request Demo Clicked", {
-                        button: "demo",
-                        page: window.location.href,
-                        time: new Date().toISOString()
-                    });
-                    showStatus("✅ 'Request Demo Clicked' sent to Amplitude!", false);
-                    console.log("Event: Request Demo Clicked");
-                } else {
-                    showStatus("⚠️ Amplitude loading...", true);
-                }
+                logEvent("Request Demo Clicked", {
+                    button: "demo",
+                    page: window.location.href,
+                    time: new Date().toISOString()
+                });
             };
         });
     </script>
