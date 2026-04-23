@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BWBMart | Data Analyst Assessment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 32px;
+            padding: 48px 40px;
+            max-width: 550px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3);
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0f2027, #2c5364);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 32px;
+            font-size: 0.9rem;
+        }
+        .button-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+        }
+        .btn {
+            padding: 14px 32px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: #0f2027;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1a3a44;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: white;
+            color: #2c5364;
+            border: 2px solid #2c5364;
+        }
+        .btn-secondary:hover {
+            background: #e8f0f3;
+            transform: translateY(-2px);
+        }
+        .info {
+            background: #f5f7fa;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: left;
+            margin-top: 24px;
+            font-size: 0.8rem;
+            border-left: 4px solid #2c5364;
+        }
+        .status {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BWBMart</h1>
+        <div class="subtitle">Analytics Demo Assessment</div>
+        
+        <div class="button-group">
+            <button class="btn btn-primary" id="signupBtn">📝 Sign Up</button>
+            <button class="btn btn-secondary" id="demoBtn">🎯 Request Demo</button>
+        </div>
+        
+        <div class="status" id="status">✅ Amplitude ready - Click buttons to track events</div>
+        
+        <div class="info">
+            <strong>✅ Assessment Requirements:</strong><br>
+            • Two CTA buttons: Sign Up & Request Demo<br>
+            • Amplitude tracking active<br>
+            • Events: "Sign Up Clicked" & "Request Demo Clicked"<br>
+            • Workspace: shiny-silence-641805 / Default Project
+        </div>
+    </div>
+
+    <!-- Amplitude SDK -->
+    <script>
+        (function(e,t){var n=e.amplitude||{_q:[],_iq:{}};var r=t.createElement("script");r.type="text/javascript";
+        r.async=true;r.src="https://cdn.amplitude.com/libs/amplitude-8.21.0-min.gz.js";
+        var i=t.getElementsByTagName("script")[0];i.parentNode.insertBefore(r,i);
+        function s(e,t){e.prototype[t]=function(){this._q.push([t].concat(Array.prototype.slice.call(arguments,0)));return this}}
+        var o=function(){this._q=[];return this};var a=["add","append","clearAll","prepend","set","setOnce","unset"];
+        for(var c=0;c<a.length;c++){s(o,a[c])}n.Identify=o;var u=function(){this._q=[];return this};
+        var l=["setProductId","setQuantity","setPrice","setRevenueType","setEventProperties"];
+        for(var p=0;p<l.length;p++){s(u,l[p])}n.Revenue=u;
+        var d=["init","logEvent","setUserId","setUserProperties","setOptOut","setVersionName","setDomain","setDeviceId","setGlobalUserProperties","identify","clearUserProperties","setGroup","logRevenueV2","regenerateDeviceId","groupIdentify","onInit"];
+        for(var h=0;h<d.length;h++){s(n,d[h])}n.getInstance=function(e){return e===t&&(e="default"),n._iq[e]=n._iq[e]||new o,n._iq[e]};e.amplitude=n;
+        })(window,document);
+
+        // ⚠️ REPLACE THIS WITH YOUR FULL API KEY ⚠️
+        amplitude.init("6b3f0e7c68c61c6cc7646ac14e66d503", null, {
+            includeReferrer: true,
+            includeUtm: true
+        });
+        
+        amplitude.setUserId("demo_user_" + Math.random().toString(36).substr(2, 8));
+        console.log("Amplitude initialized");
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const statusDiv = document.getElementById('status');
+            
+            function showStatus(msg, isError) {
+                statusDiv.innerHTML = msg;
+                statusDiv.style.color = isError ? '#dc3545' : '#28a745';
+                setTimeout(() => {
+                    if (statusDiv.innerHTML === msg) statusDiv.innerHTML = '✅ Ready - Click buttons';
+                }, 2000);
+            }
+            
+            document.getElementById('signupBtn').onclick = function() {
+                if (typeof amplitude !== 'undefined') {
+                    amplitude.logEvent("Sign Up Clicked", {
+                        button: "signup",
+                        page: window.location.href,
+                        time: new Date().toISOString()
+                    });
+                    showStatus("✅ 'Sign Up Clicked' sent to Amplitude!", false);
+                    console.log("Event: Sign Up Clicked");
+                } else {
+                    showStatus("⚠️ Amplitude loading...", true);
+                }
+            };
+            
+            document.getElementById('demoBtn').onclick = function() {
+                if (typeof amplitude !== 'undefined') {
+                    amplitude.logEvent("Request Demo Clicked", {
+                        button: "demo",
+                        page: window.location.href,
+                        time: new Date().toISOString()
+                    });
+                    showStatus("✅ 'Request Demo Clicked' sent to Amplitude!", false);
+                    console.log("Event: Request Demo Clicked");
+                } else {
+                    showStatus("⚠️ Amplitude loading...", true);
+                }
+            };
+        });
+    </script>
+</body>
+</html>
